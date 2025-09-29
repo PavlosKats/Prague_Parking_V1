@@ -37,7 +37,7 @@ namespace Prague_Parking_V1
                         Registervehicle();
                         break;
                     case "2":
-                        //CheckOutVehicle();
+                        CheckOutVehicle();
                         break;
                     case "3":
                         //MoveVehicle();
@@ -149,37 +149,101 @@ namespace Prague_Parking_V1
         //Method to check the status of all parking spots
         public static void CheckParkingStatus()
         {
+            //int fullSpots = 0;
+            //int freeSpots = 0;
+            //List <int> fullSpotNumbers = new List<int>();
+            //List <int> mcAvailableSpots = new List<int>();
+
+            //for (int i = 0; i < parkingSpots.Length; i++)
+            //{
+            //    var spot = parkingSpots[i];
+            //    // Full: 1 car or 2 motorcycles
+            //    if (spot.Count == 1 && spot[0].StartsWith("CAR"))
+            //    {
+            //        fullSpots++;
+            //        fullSpotNumbers.Add(i + 1);
+            //    }
+            //    else if (spot.Count == 2 && spot[0].StartsWith("MC") && spot[1].StartsWith("MC"))
+            //    {
+            //        fullSpots++;
+            //        fullSpotNumbers.Add(i + 1);
+            //    }
+            //    else if (spot.Count == 1 && spot[0].StartsWith("MC"))
+            //    {
+            //        // Spot has one MC, available for another MC
+            //        mcAvailableSpots.Add(i + 1);
+            //        freeSpots++;
+            //    }
+            //    else
+            //    {
+            //        freeSpots++;
+            //    }
+            //}
+            //Console.WriteLine($"Total full spots: {fullSpots}");
+            //Console.WriteLine($"Total free spots: {freeSpots}");
+            //if (fullSpotNumbers.Count > 0)
+            //{
+            //    Console.WriteLine("Full spots: " + string.Join(", ", fullSpotNumbers));
+            //}
+            //else
+            //{
+            //    Console.WriteLine("No full spots.");
+            //}
+            //if (mcAvailableSpots.Count > 0)
+            //{
+            //    Console.WriteLine("Spots with one MC (available for another MC): " + string.Join(", ", mcAvailableSpots));
+
+            //}
+
             int fullSpots = 0;
             int freeSpots = 0;
-            List <int> fullSpotNumbers = new List<int>();
-            List <int> mcAvailableSpots = new List<int>();
+            List<int> fullSpotNumbers = new List<int>();
+            List<int> mcAvailableSpots = new List<int>();
 
+            Console.WriteLine("\nParking Spot Status:");
             for (int i = 0; i < parkingSpots.Length; i++)
             {
                 var spot = parkingSpots[i];
-                // Full: 1 car or 2 motorcycles
-                if (spot.Count == 1 && spot[0].StartsWith("CAR"))
+                string spotInfo = $"Spot {i + 1}: ";
+
+                if (spot.Count == 0)
                 {
-                    fullSpots++;
-                    fullSpotNumbers.Add(i + 1);
-                }
-                else if (spot.Count == 2 && spot[0].StartsWith("MC") && spot[1].StartsWith("MC"))
-                {
-                    fullSpots++;
-                    fullSpotNumbers.Add(i + 1);
-                }
-                else if (spot.Count == 1 && spot[0].StartsWith("MC"))
-                {
-                    // Spot has one MC, available for another MC
-                    mcAvailableSpots.Add(i + 1);
+                    spotInfo += "Empty";
                     freeSpots++;
                 }
                 else
                 {
-                    freeSpots++;
+                    // Show all vehicles in the spot
+                    var vehicles = spot.Select(v =>
+                    {
+                        var parts = v.Split('#');
+                        return $"{parts[0]} ({parts[1]})";
+                    });
+                    spotInfo += string.Join(", ", vehicles);
+
+                    if (spot.Count == 1 && spot[0].StartsWith("CAR"))
+                    {
+                        fullSpots++;
+                        fullSpotNumbers.Add(i + 1);
+                    }
+                    else if (spot.Count == 2 && spot[0].StartsWith("MC") && spot[1].StartsWith("MC"))
+                    {
+                        fullSpots++;
+                        fullSpotNumbers.Add(i + 1);
+                    }
+                    else if (spot.Count == 1 && spot[0].StartsWith("MC"))
+                    {
+                        mcAvailableSpots.Add(i + 1);
+                        freeSpots++;
+                    }
+                    else
+                    {
+                        freeSpots++;
+                    }
                 }
+                Console.WriteLine(spotInfo);
             }
-            Console.WriteLine($"Total full spots: {fullSpots}");
+            Console.WriteLine($"\nTotal full spots: {fullSpots}");
             Console.WriteLine($"Total free spots: {freeSpots}");
             if (fullSpotNumbers.Count > 0)
             {
@@ -192,7 +256,74 @@ namespace Prague_Parking_V1
             if (mcAvailableSpots.Count > 0)
             {
                 Console.WriteLine("Spots with one MC (available for another MC): " + string.Join(", ", mcAvailableSpots));
+            }
+        }
 
+        //Method to check out a vehicle
+        public static void CheckOutVehicle()
+        {
+            Console.WriteLine("\nWould you like to check out by:");
+            Console.WriteLine("\t1: Parking spot number");
+            Console.WriteLine("\t2: License plate");
+            string option = Console.ReadLine();
+
+            if (option == "1")
+            {
+                Console.WriteLine("\nEnter the parking spot number to check out from (1-100):");
+                int spotNumber;
+                if (!int.TryParse(Console.ReadLine(), out spotNumber) || spotNumber < 1 || spotNumber > 100)
+                {
+                    Console.WriteLine("\nInvalid parking spot number. Please enter a number between 1 and 100.");
+                    return;
+                }
+
+                var spot = parkingSpots[spotNumber - 1];
+                if (spot.Count == 0)
+                {
+                    Console.WriteLine($"\nParking spot {spotNumber} is already empty.");
+                    return;
+                }
+
+                Console.WriteLine("\nEnter the license plate of the vehicle to check out:");
+                string licensePlate = Console.ReadLine().ToUpper();
+
+                int index = spot.FindIndex(v => v.EndsWith("#" + licensePlate));
+                if (index == -1)
+                {
+                    Console.WriteLine($"\nVehicle with license plate {licensePlate} not found in spot {spotNumber}.");
+                    return;
+                }
+
+                spot.RemoveAt(index);
+                Console.WriteLine($"\nVehicle {licensePlate} has been checked out from spot {spotNumber}.");
+            }
+            else if (option == "2")
+            {
+                Console.WriteLine("\nEnter the license plate of the vehicle to check out:");
+                string licensePlate = Console.ReadLine().ToUpper();
+                bool found = false;
+
+                for (int i = 0; i < parkingSpots.Length; i++)
+                {
+                    var spot = parkingSpots[i];
+                    int index = spot.FindIndex(v => v.EndsWith("#" + licensePlate));
+                    if (index != -1)
+                    {
+                        spot.RemoveAt(index);
+                        Console.WriteLine($"\nVehicle {licensePlate} has been checked out from spot {i + 1}.");
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    Console.WriteLine($"\nVehicle with license plate {licensePlate} not found in any spot.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("\nInvalid option. Please select 1 or 2.");
             }
         }
     }
