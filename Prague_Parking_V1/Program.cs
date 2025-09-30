@@ -20,11 +20,13 @@ namespace Prague_Parking_V1
             {
                 parkingSpots[i] = new List<string>();
             }
+
+            //while loop to keep the program running until the user decides to exit
             bool running = true;
             while (running)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine(new string('=',100));
+                Console.WriteLine(new string('=', 100));
                 Console.ResetColor();
 
                 Console.WriteLine("\n\nWelcome to Prague Parking.\n\nWhat would you like to do?");
@@ -40,7 +42,7 @@ namespace Prague_Parking_V1
                         CheckOutVehicle();
                         break;
                     case "3":
-                        //MoveVehicle();
+                        MoveVehicle();
                         break;
                     case "4":
                         CheckSpotAvailability();
@@ -58,8 +60,6 @@ namespace Prague_Parking_V1
                 }
 
             }
-
-            //Display the menu
 
         }
 
@@ -108,7 +108,7 @@ namespace Prague_Parking_V1
         //Check if spot is available
         public static bool IsSpotAvailable(string type, int spotNumber)
         {
-            
+
             var vehicles = parkingSpots[spotNumber - 1];
             if (type == "CAR")
             {
@@ -325,6 +325,60 @@ namespace Prague_Parking_V1
             {
                 Console.WriteLine("\nInvalid option. Please select 1 or 2.");
             }
+        }
+
+        //Method to move a vehicle to another spot
+        /*
+         * check if this method works as intended
+         */
+        public static void MoveVehicle()
+        {
+            Console.WriteLine("\nEnter the license plate of the vehicle to move:");
+            string licensePlate = Console.ReadLine().ToUpper();
+            int fromSpot = -1;
+            string vehicleType = null;
+            string vehicleString = null;
+
+            // Find the vehicle and its current spot
+            for (int i = 0; i < parkingSpots.Length; i++)
+            {
+                var spot = parkingSpots[i];
+                int index = spot.FindIndex(v => v.EndsWith("#" + licensePlate));
+                if (index != -1)
+                {
+                    fromSpot = i;
+                    vehicleString = spot[index];
+                    vehicleType = vehicleString.StartsWith("MC") ? "MC" : "CAR";
+                    break;
+                }
+            }
+
+            if (fromSpot == -1)
+            {
+                Console.WriteLine($"\nVehicle with license plate {licensePlate} not found in any spot.");
+                return;
+            }
+
+            Console.WriteLine($"\nVehicle found in spot {fromSpot + 1}.");
+            Console.WriteLine("\nEnter the destination parking spot (1-100):");
+            int toSpot;
+            if (!int.TryParse(Console.ReadLine(), out toSpot) || toSpot < 1 || toSpot > 100)
+            {
+                Console.WriteLine("\nInvalid parking spot number. Please enter a number between 1 and 100.");
+                return;
+            }
+
+            // Check if destination spot is available for this vehicle type
+            if (!IsSpotAvailable(vehicleType, toSpot))
+            {
+                Console.WriteLine($"\nDestination spot {toSpot} is not available for a {vehicleType}.");
+                return;
+            }
+
+            // Move the vehicle
+            parkingSpots[fromSpot].Remove(vehicleString);
+            parkingSpots[toSpot - 1].Add(vehicleString);
+            Console.WriteLine($"\nVehicle {licensePlate} moved from spot {fromSpot + 1} to {toSpot}.");
         }
     }
 }
