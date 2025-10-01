@@ -91,7 +91,7 @@ namespace Prague_Parking_V1
                 Console.WriteLine("\nInvalid license plate format. Please use the format ABC1234.");
                 return;
             }
-
+            //check if the vehicle is already registered or user entered a duplicate license plate
             Console.WriteLine("\nEnter the desired parking spot (1-100)");
             int spotNumber;
             if (!int.TryParse(Console.ReadLine(), out spotNumber) || spotNumber < 1 || spotNumber > 100 || !IsSpotAvailable(type, spotNumber))
@@ -108,11 +108,12 @@ namespace Prague_Parking_V1
         //Check if spot is available
         public static bool IsSpotAvailable(string type, int spotNumber)
         {
-
+            //spot number is 1-100, array index is 0-99
             var vehicles = parkingSpots[spotNumber - 1];
+            //check if spot is available based on vehicle type
             if (type == "CAR")
             {
-                //spot must be empty for CAR
+                //spot can have only 0 or 1 car
                 return vehicles.Count == 0;
             }
             else // MC
@@ -124,11 +125,13 @@ namespace Prague_Parking_V1
         //New method to check spot availability
         public static void CheckSpotAvailability()
         {
+            //take vehicle type and spot number as input
             Console.WriteLine("\nSelect vehicle type to check:\n\t1:Car\n\t2:Motorcycle");
             string vehicleType = Console.ReadLine();
             string type = vehicleType == "2" ? "MC" : "CAR";
 
             Console.WriteLine("\nEnter parking spot number to check (1-100):");
+            
             int spotNumber;
             if (!int.TryParse(Console.ReadLine(), out spotNumber) || spotNumber < 1 || spotNumber > 100)
             {
@@ -149,63 +152,22 @@ namespace Prague_Parking_V1
         //Method to check the status of all parking spots
         public static void CheckParkingStatus()
         {
-            //int fullSpots = 0;
-            //int freeSpots = 0;
-            //List <int> fullSpotNumbers = new List<int>();
-            //List <int> mcAvailableSpots = new List<int>();
-
-            //for (int i = 0; i < parkingSpots.Length; i++)
-            //{
-            //    var spot = parkingSpots[i];
-            //    // Full: 1 car or 2 motorcycles
-            //    if (spot.Count == 1 && spot[0].StartsWith("CAR"))
-            //    {
-            //        fullSpots++;
-            //        fullSpotNumbers.Add(i + 1);
-            //    }
-            //    else if (spot.Count == 2 && spot[0].StartsWith("MC") && spot[1].StartsWith("MC"))
-            //    {
-            //        fullSpots++;
-            //        fullSpotNumbers.Add(i + 1);
-            //    }
-            //    else if (spot.Count == 1 && spot[0].StartsWith("MC"))
-            //    {
-            //        // Spot has one MC, available for another MC
-            //        mcAvailableSpots.Add(i + 1);
-            //        freeSpots++;
-            //    }
-            //    else
-            //    {
-            //        freeSpots++;
-            //    }
-            //}
-            //Console.WriteLine($"Total full spots: {fullSpots}");
-            //Console.WriteLine($"Total free spots: {freeSpots}");
-            //if (fullSpotNumbers.Count > 0)
-            //{
-            //    Console.WriteLine("Full spots: " + string.Join(", ", fullSpotNumbers));
-            //}
-            //else
-            //{
-            //    Console.WriteLine("No full spots.");
-            //}
-            //if (mcAvailableSpots.Count > 0)
-            //{
-            //    Console.WriteLine("Spots with one MC (available for another MC): " + string.Join(", ", mcAvailableSpots));
-
-            //}
-
+            //Counters for full and free spots
             int fullSpots = 0;
             int freeSpots = 0;
             List<int> fullSpotNumbers = new List<int>();
             List<int> mcAvailableSpots = new List<int>();
 
             Console.WriteLine("\nParking Spot Status:");
+
+            // Iterate through all parking spots
             for (int i = 0; i < parkingSpots.Length; i++)
             {
+                // Get the current spot
                 var spot = parkingSpots[i];
                 string spotInfo = $"Spot {i + 1}: ";
 
+                // Check if the spot is empty
                 if (spot.Count == 0)
                 {
                     spotInfo += "Empty";
@@ -221,6 +183,7 @@ namespace Prague_Parking_V1
                     });
                     spotInfo += string.Join(", ", vehicles);
 
+                    // Determine if the spot is full and count accordingly
                     if (spot.Count == 1 && spot[0].StartsWith("CAR"))
                     {
                         fullSpots++;
@@ -243,6 +206,8 @@ namespace Prague_Parking_V1
                 }
                 Console.WriteLine(spotInfo);
             }
+
+            //Summary of parking status
             Console.WriteLine($"\nTotal full spots: {fullSpots}");
             Console.WriteLine($"Total free spots: {freeSpots}");
             if (fullSpotNumbers.Count > 0)
@@ -251,7 +216,7 @@ namespace Prague_Parking_V1
             }
             else
             {
-                Console.WriteLine("No full spots.");
+                Console.WriteLine("No occupied spots.");
             }
             if (mcAvailableSpots.Count > 0)
             {
@@ -262,11 +227,13 @@ namespace Prague_Parking_V1
         //Method to check out a vehicle
         public static void CheckOutVehicle()
         {
+            //ask user if they want to check out by spot number or license plate
             Console.WriteLine("\nWould you like to check out by:");
             Console.WriteLine("\t1: Parking spot number");
             Console.WriteLine("\t2: License plate");
             string option = Console.ReadLine();
 
+            //check out by spot number
             if (option == "1")
             {
                 Console.WriteLine("\nEnter the parking spot number to check out from (1-100):");
@@ -277,6 +244,7 @@ namespace Prague_Parking_V1
                     return;
                 }
 
+                //check if the spot is empty
                 var spot = parkingSpots[spotNumber - 1];
                 if (spot.Count == 0)
                 {
@@ -284,9 +252,11 @@ namespace Prague_Parking_V1
                     return;
                 }
 
+                
                 Console.WriteLine("\nEnter the license plate of the vehicle to check out:");
                 string licensePlate = Console.ReadLine().ToUpper();
 
+                //find the vehicle in the spot
                 int index = spot.FindIndex(v => v.EndsWith("#" + licensePlate));
                 if (index == -1)
                 {
@@ -303,6 +273,7 @@ namespace Prague_Parking_V1
                 string licensePlate = Console.ReadLine().ToUpper();
                 bool found = false;
 
+                //search all spots for the vehicle
                 for (int i = 0; i < parkingSpots.Length; i++)
                 {
                     var spot = parkingSpots[i];
@@ -328,11 +299,9 @@ namespace Prague_Parking_V1
         }
 
         //Method to move a vehicle to another spot
-        /*
-         * check if this method works as intended
-         */
         public static void MoveVehicle()
         {
+            //take license plate and destination spot as input
             Console.WriteLine("\nEnter the license plate of the vehicle to move:");
             string licensePlate = Console.ReadLine().ToUpper();
             int fromSpot = -1;
@@ -352,13 +321,14 @@ namespace Prague_Parking_V1
                     break;
                 }
             }
-
+            // If vehicle not found
             if (fromSpot == -1)
             {
                 Console.WriteLine($"\nVehicle with license plate {licensePlate} not found in any spot.");
                 return;
             }
 
+            // Display current spot and ask for destination
             Console.WriteLine($"\nVehicle found in spot {fromSpot + 1}.");
             Console.WriteLine("\nEnter the destination parking spot (1-100):");
             int toSpot;
