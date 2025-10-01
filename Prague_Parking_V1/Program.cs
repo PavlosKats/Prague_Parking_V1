@@ -247,7 +247,7 @@ namespace Prague_Parking_V1
             Console.WriteLine($"Total free spots: {freeSpots}");
             if (fullSpotNumbers.Count > 0)
             {
-                Console.WriteLine("Full spots: " + string.Join(", ", fullSpotNumbers));
+                Console.WriteLine("Parking Spots occupied: " + string.Join(", ", fullSpotNumbers));
             }
             else
             {
