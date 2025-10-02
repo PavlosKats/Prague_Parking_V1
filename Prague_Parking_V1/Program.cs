@@ -69,6 +69,7 @@ namespace Prague_Parking_V1
             //take the vehicle type and license plate as input
             Console.WriteLine("\nSelect vehicle type:\n\t1: Car\n\t2: Motorcycle");
             string vehicleType = Console.ReadLine();
+            //ternary operator to set the vehicle type
             string type = vehicleType == "2" ? "MC" : "CAR";
 
 
@@ -91,6 +92,7 @@ namespace Prague_Parking_V1
                 Console.WriteLine("\nInvalid license plate format. Please use the format ABC1234.");
                 return;
             }
+
             //check if the vehicle is already registered or user entered a duplicate license plate
             Console.WriteLine("\nEnter the desired parking spot (1-100)");
             int spotNumber;
@@ -181,7 +183,7 @@ namespace Prague_Parking_V1
                         var parts = v.Split('#');
                         return $"{parts[0]} ({parts[1]})";
                     });
-                    spotInfo += string.Join(", ", vehicles);
+                    spotInfo += string.Join("| ", vehicles);
 
                     // Determine if the spot is full and count accordingly
                     if (spot.Count == 1 && spot[0].StartsWith("CAR"))
@@ -220,7 +222,7 @@ namespace Prague_Parking_V1
             }
             if (mcAvailableSpots.Count > 0)
             {
-                Console.WriteLine("Spots with one MC (available for another MC): " + string.Join(", ", mcAvailableSpots));
+                Console.WriteLine("Spot number with one MC (available for another MC): " + string.Join(", ", mcAvailableSpots));
             }
         }
 
