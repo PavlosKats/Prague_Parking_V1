@@ -25,12 +25,41 @@ namespace Prague_Parking_V1._1
             bool running = true;
             while (running)
             {
+                //Console.ForegroundColor = ConsoleColor.Green;
+                //Console.WriteLine(new string('=', 100));
+                //Console.ResetColor();
+
+                //Console.WriteLine("\n\nWelcome to Prague Parking.\n\nWhat would you like to do?");
+                //Console.WriteLine("\n\t1: Register vehicle\n\t2: Check out vehicle\n\t3: Move vehicle to another spot\n\t4: Check parking spot availability\n\t5: Check status of all parking spots\n\t0: Exit");
+                string[] menuLines = new[]
+                {
+                    "",
+                    "Welcome to Prague Parking.",
+                    "",
+                    "What would you like to do?",
+                    "",
+                    "  1: Register vehicle",
+                    "  2: Check out vehicle",
+                    "  3: Move vehicle to another spot",
+                    "  4: Check parking spot availability",
+                    "  5: Check status of all parking spots",
+                    "  0: Exit",
+                    ""
+                };
+
+                // Calculate box width with LINQ .Max method
+                int boxWidth = menuLines.Max(l => l.Length) + 20; // Padding 
+
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine(new string('=', 100));
+                Console.WriteLine(new string('=', boxWidth));
+                foreach (var line in menuLines)
+                {
+                    Console.WriteLine($"| {line.PadRight(boxWidth - 3)} |");
+                }
+                Console.WriteLine(new string('=', boxWidth));
                 Console.ResetColor();
 
-                Console.WriteLine("\n\nWelcome to Prague Parking.\n\nWhat would you like to do?");
-                Console.WriteLine("\n\t1: Register vehicle\n\t2: Check out vehicle\n\t3: Move vehicle to another spot\n\t4: Check parking spot availability\n\t5: Check status of all parking spots\n\t0: Exit");
+
 
                 string choice = Console.ReadLine();
                 switch (choice)
