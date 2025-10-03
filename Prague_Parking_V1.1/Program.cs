@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 
-namespace Prague_Parking_V1
+namespace Prague_Parking_V1._1
 {
     internal class Program
     {
@@ -133,7 +133,7 @@ namespace Prague_Parking_V1
             string type = vehicleType == "2" ? "MC" : "CAR";
 
             Console.WriteLine("\nEnter parking spot number to check (1-100):");
-
+            
             int spotNumber;
             if (!int.TryParse(Console.ReadLine(), out spotNumber) || spotNumber < 1 || spotNumber > 100)
             {
@@ -254,7 +254,7 @@ namespace Prague_Parking_V1
                     return;
                 }
 
-
+                
                 Console.WriteLine("\nEnter the license plate of the vehicle to check out:");
                 string licensePlate = Console.ReadLine().ToUpper();
 
