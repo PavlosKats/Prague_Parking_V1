@@ -41,8 +41,9 @@ namespace Prague_Parking_V1._1
                     "  1: Register vehicle",
                     "  2: Check out vehicle",
                     "  3: Move vehicle to another spot",
-                    "  4: Check parking spot availability",
+                    "  4: Check parking spot number availability",
                     "  5: Check status of all parking spots",
+                    "  6: Optimize motorcycle parking",
                     "  0: Exit",
                     ""
                 };
@@ -78,6 +79,9 @@ namespace Prague_Parking_V1._1
                         break;
                     case "5":
                         CheckParkingStatus();
+                        break;
+                    case "6":
+                        OptimizeMotorcycleParking();
                         break;
                     case "0":
                         running = false;
@@ -131,8 +135,10 @@ namespace Prague_Parking_V1._1
                 return;
             }
             //register parking spot
-            parkingSpots[spotNumber - 1].Add(type + "#" + licensePlate);
-            Console.WriteLine($"\n\nVehicle {licensePlate} of type {type} registered at spot {spotNumber}.\n\n");
+            //show date and time of registration
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            parkingSpots[spotNumber - 1].Add(type + "#" + licensePlate + "#" + timestamp);
+            Console.WriteLine($"\n\nVehicle {licensePlate} of type {type} registered at spot {spotNumber} on {timestamp}.\n\n");
 
         }
 
@@ -233,6 +239,7 @@ namespace Prague_Parking_V1._1
                             string[] parts = v.Split('#');
                             string type = parts[0];
                             string plate = parts[1];
+                            string timestamp = parts.Length > 2 ? parts[2] : "";
 
                             // Set color based on type
                             if (type == "CAR")
@@ -242,8 +249,13 @@ namespace Prague_Parking_V1._1
                             else
                                 Console.ResetColor();
 
-                            Console.Write(plate);
-                            usedWidth += plate.Length;
+                            string display = plate;
+                            // Truncate if too long
+                            if (display.Length > boxWidth -1)
+                                display = display.Substring(0, boxWidth - 1);
+
+                            Console.Write(display);
+                            usedWidth += display.Length;
 
                             // Separator for multiple vehicles
                             if (v != vehicles.Last())
@@ -350,11 +362,23 @@ namespace Prague_Parking_V1._1
                 string licensePlate = Console.ReadLine().ToUpper();
 
                 //find the vehicle in the spot
-                int index = spot.FindIndex(v => v.EndsWith("#" + licensePlate));
+                int index = spot.FindIndex(v => v.Split("#")[1] == licensePlate);
                 if (index == -1)
                 {
                     Console.WriteLine($"\nVehicle with license plate {licensePlate} not found in spot {spotNumber}.");
                     return;
+                }
+
+                string[] parts = spot[index].Split('#');
+                string timestamp = parts.Length > 2 ? parts[2] : "N/A";
+                Console.WriteLine($"\nVehicle {licensePlate} was registered on {timestamp}.");
+
+                //calculate parking duration
+                if(DateTime.TryParse(timestamp, out DateTime registeredTime))
+                {
+                    TimeSpan duration = DateTime.Now - registeredTime;
+                    string durationStr = $"{(int)duration.Hours} hours,{duration.Minutes} minutes, {duration.Seconds} seconds";
+                    Console.WriteLine($"Vehicle was parked for {durationStr}");
                 }
 
                 spot.RemoveAt(index);
@@ -370,9 +394,22 @@ namespace Prague_Parking_V1._1
                 for (int i = 0; i < parkingSpots.Length; i++)
                 {
                     var spot = parkingSpots[i];
-                    int index = spot.FindIndex(v => v.EndsWith("#" + licensePlate));
+                    int index = spot.FindIndex(v => v.Split('#')[1] == licensePlate);
                     if (index != -1)
                     {
+                        string[] parts = spot[index].Split('#');
+                        string timestamp = parts.Length > 2 ? parts[2] : "N/A";
+                        Console.WriteLine($"\nVehicle {licensePlate} was registered on {timestamp}.");
+
+                        // Calculate and display duration
+                        if (DateTime.TryParse(timestamp, out DateTime registeredTime))
+                        {
+                            TimeSpan duration = DateTime.Now - registeredTime;
+                            string durationStr = $"{(int)duration.Hours} hours, {duration.Minutes} minutes, {duration.Seconds} seconds";
+                            Console.WriteLine($"Vehicle was parked for: {durationStr}");
+                        }
+
+                        //remove vehicle from spot
                         spot.RemoveAt(index);
                         Console.WriteLine($"\nVehicle {licensePlate} has been checked out from spot {i + 1}.");
                         found = true;
@@ -405,7 +442,7 @@ namespace Prague_Parking_V1._1
             for (int i = 0; i < parkingSpots.Length; i++)
             {
                 var spot = parkingSpots[i];
-                int index = spot.FindIndex(v => v.EndsWith("#" + licensePlate));
+                int index = spot.FindIndex(v => v.Split('#')[1] == licensePlate);
                 if (index != -1)
                 {
                     fromSpot = i;
@@ -442,6 +479,60 @@ namespace Prague_Parking_V1._1
             parkingSpots[fromSpot].Remove(vehicleString);
             parkingSpots[toSpot - 1].Add(vehicleString);
             Console.WriteLine($"\nVehicle {licensePlate} moved from spot {fromSpot + 1} to {toSpot}.");
+        }
+
+        public static void OptimizeMotorcycleParking()
+        {
+            // Find all spots with exactly one MC
+            var singleMCSpots = new List<int>();
+            for (int i = 0; i < parkingSpots.Length; i++)
+            {
+                var spot = parkingSpots[i];
+                if (spot.Count == 1 && spot[0].StartsWith("MC"))
+                {
+                    singleMCSpots.Add(i);
+                }
+            }
+
+            // Try to pair up single MCs
+            var moved = new List<(string licensePlate, int fromSpot, int toSpot)>();
+            var used = new HashSet<int>();
+
+            for (int i = 0; i < singleMCSpots.Count; i++)
+            {
+                if (used.Contains(singleMCSpots[i])) continue;
+                for (int j = i + 1; j < singleMCSpots.Count; j++)
+                {
+                    if (used.Contains(singleMCSpots[j])) continue;
+
+                    // Move MC from spot j to spot i
+                    var fromSpot = singleMCSpots[j];
+                    var toSpot = singleMCSpots[i];
+                    var mcVehicle = parkingSpots[fromSpot][0];
+                    parkingSpots[toSpot].Add(mcVehicle);
+                    parkingSpots[fromSpot].RemoveAt(0);
+
+                    string licensePlate = mcVehicle.Split('#')[1];
+                    moved.Add((licensePlate, fromSpot + 1, toSpot + 1));
+                    used.Add(fromSpot);
+                    used.Add(toSpot);
+                    break; // Only pair once
+                }
+            }
+
+            // Display transactions
+            if (moved.Count == 0)
+            {
+                Console.WriteLine("\nNo optimization moves were made. All single MCs are already paired or no pairs available.");
+            }
+            else
+            {
+                Console.WriteLine("\nMotorcycle parking optimization transactions:");
+                foreach (var move in moved)
+                {
+                    Console.WriteLine($"MC {move.licensePlate} moved from spot {move.fromSpot} to spot {move.toSpot}.");
+                }
+            }
         }
     }
 }
