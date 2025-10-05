@@ -47,7 +47,7 @@ namespace Prague_Parking_V1._1
                     ""
                 };
 
-                // Calculate box width with LINQ .Max method
+                // Calculate box width with LINQ .Max method, l is each line in the menuLines array
                 int boxWidth = menuLines.Max(l => l.Length) + 20; // Padding 
 
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -180,41 +180,104 @@ namespace Prague_Parking_V1._1
 
         }
 
-        //Method to check the status of all parking spots
         public static void CheckParkingStatus()
         {
-            //Counters for full and free spots
+            int columns = 10;
+            int rows = 10;
+            int boxWidth = 16; // Adjust for license plate length
+
             int fullSpots = 0;
             int freeSpots = 0;
             List<int> fullSpotNumbers = new List<int>();
             List<int> mcAvailableSpots = new List<int>();
 
-            Console.WriteLine("\nParking Spot Status:");
+            Console.WriteLine("\nParking Plan:\n");
 
-            // Iterate through all parking spots
+            for (int row = 0; row < rows; row++)
+            {
+                // Top border of boxes
+                for (int col = 0; col < columns; col++)
+                {
+                    Console.Write("+" + new string('-', boxWidth - 1));
+                }
+                Console.WriteLine("+");
+
+                // Spot number row
+                for (int col = 0; col < columns; col++)
+                {
+                    int spotIndex = row * columns + col;
+                    string spotNum = (spotIndex + 1).ToString().PadLeft(3, ' ');
+                    Console.Write($"|{spotNum.PadRight(boxWidth - 1)}");
+                }
+                Console.WriteLine("|");
+
+                // License plate row
+                for (int col = 0; col < columns; col++)
+                {
+                    int spotIndex = row * columns + col;
+                    var vehicles = parkingSpots[spotIndex];
+
+                    string cellContent = "";
+                    if (vehicles.Count == 0)
+                    {
+                        cellContent = "".PadRight(boxWidth - 1);
+                        Console.Write($"|{cellContent}");
+                    }
+                    else
+                    {
+                        // Color-coding for each vehicle in the spot
+                        Console.Write("|");
+                        int usedWidth = 0;
+                        foreach (var v in vehicles)
+                        {
+                            string[] parts = v.Split('#');
+                            string type = parts[0];
+                            string plate = parts[1];
+
+                            // Set color based on type
+                            if (type == "CAR")
+                                Console.ForegroundColor = ConsoleColor.Red;
+                            else if (type == "MC")
+                                Console.ForegroundColor = ConsoleColor.Cyan;
+                            else
+                                Console.ResetColor();
+
+                            Console.Write(plate);
+                            usedWidth += plate.Length;
+
+                            // Separator for multiple vehicles
+                            if (v != vehicles.Last())
+                            {
+                                Console.ResetColor();
+                                Console.Write(",");
+                                usedWidth += 1;
+                            }
+                        }
+                        Console.ResetColor();
+                        // Pad the rest of the cell
+                        Console.Write(new string(' ', boxWidth - 1 - usedWidth));
+                    }
+                }
+                Console.WriteLine("|");
+            }
+
+            // Bottom border of boxes
+            for (int col = 0; col < columns; col++)
+            {
+                Console.Write("+" + new string('-', boxWidth - 1));
+            }
+            Console.WriteLine("+");
+
+            // Summary calculation 
             for (int i = 0; i < parkingSpots.Length; i++)
             {
-                // Get the current spot
                 var spot = parkingSpots[i];
-                string spotInfo = $"Spot {i + 1}: ";
-
-                // Check if the spot is empty
                 if (spot.Count == 0)
                 {
-                    spotInfo += "Empty";
                     freeSpots++;
                 }
                 else
                 {
-                    // Show all vehicles in the spot
-                    var vehicles = spot.Select(v =>
-                    {
-                        var parts = v.Split('#');
-                        return $"{parts[0]} ({parts[1]})";
-                    });
-                    spotInfo += string.Join("| ", vehicles);
-
-                    // Determine if the spot is full and count accordingly
                     if (spot.Count == 1 && spot[0].StartsWith("CAR"))
                     {
                         fullSpots++;
@@ -235,15 +298,14 @@ namespace Prague_Parking_V1._1
                         freeSpots++;
                     }
                 }
-                Console.WriteLine(spotInfo);
             }
 
-            //Summary of parking status
+            // Display summary
             Console.WriteLine($"\nTotal full spots: {fullSpots}");
             Console.WriteLine($"Total free spots: {freeSpots}");
             if (fullSpotNumbers.Count > 0)
             {
-                Console.WriteLine("Parking Spots occupied: " + string.Join(", ", fullSpotNumbers));
+                Console.WriteLine("Parking Spot number occupied: " + string.Join(", ", fullSpotNumbers));
             }
             else
             {
