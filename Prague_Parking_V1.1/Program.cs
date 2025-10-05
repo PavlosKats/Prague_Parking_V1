@@ -102,13 +102,17 @@ namespace Prague_Parking_V1._1
             //take the vehicle type and license plate as input
             Console.WriteLine("\nSelect vehicle type:\n\t1: Car\n\t2: Motorcycle");
             string vehicleType = Console.ReadLine();
+            if (vehicleType!= "1" && vehicleType != "2")
+            {
+                Console.WriteLine("Please choose the right vehicle type(1 for Car, 2 for Motorcycle)");
+                return;
+            }
             //ternary operator to set the vehicle type
             string type = vehicleType == "2" ? "MC" : "CAR";
 
 
             Console.WriteLine("\nEnter vehicle license plate:");
             string licensePlate = Console.ReadLine().ToUpper();
-
 
 
             //check for null or empty license plate
