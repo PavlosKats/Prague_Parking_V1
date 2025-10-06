@@ -527,14 +527,14 @@ namespace Prague_Parking_V1._1
             // Display transactions
             if (moved.Count == 0)
             {
-                Console.WriteLine("\nNo optimization moves were made. All single MCs are already paired or no pairs available.");
+                Console.WriteLine("\nNo optimization moves were made. All single MCs are already paired or no pairs available.\n");
             }
             else
             {
-                Console.WriteLine("\nMotorcycle parking optimization transactions:");
+                Console.WriteLine("\nMotorcycle parking optimization transactions: ");
                 foreach (var move in moved)
                 {
-                    Console.WriteLine($"MC {move.licensePlate} moved from spot {move.fromSpot} to spot {move.toSpot}.");
+                    Console.WriteLine($"\nMC {move.licensePlate} moved from spot {move.fromSpot} to spot {move.toSpot}.\n\n");
                 }
             }
         }

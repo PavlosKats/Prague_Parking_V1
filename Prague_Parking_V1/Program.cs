@@ -135,6 +135,11 @@ namespace Prague_Parking_V1
             //take vehicle type and spot number as input
             Console.WriteLine("\nSelect vehicle type to check:\n\t1:Car\n\t2:Motorcycle");
             string vehicleType = Console.ReadLine();
+            if (vehicleType != "1" && vehicleType != "2")
+            {
+                Console.WriteLine("\nPlease choose the right vehicle type(1 for Car, 2 for Motorcycle)\n");
+                return;
+            }
             string type = vehicleType == "2" ? "MC" : "CAR";
 
             Console.WriteLine("\nEnter parking spot number to check (1-100):");
@@ -162,6 +167,9 @@ namespace Prague_Parking_V1
             //Counters for full and free spots
             int fullSpots = 0;
             int freeSpots = 0;
+            int mcSpots = 0;
+
+            //Lists to hold full spot numbers and spots with one motorcycle
             List<int> fullSpotNumbers = new List<int>();
             List<int> mcAvailableSpots = new List<int>();
 
@@ -204,7 +212,7 @@ namespace Prague_Parking_V1
                     else if (spot.Count == 1 && spot[0].StartsWith("MC"))
                     {
                         mcAvailableSpots.Add(i + 1);
-                        freeSpots++;
+                        mcSpots++;
                     }
                     else
                     {
@@ -217,6 +225,7 @@ namespace Prague_Parking_V1
             //Summary of parking status
             Console.WriteLine($"\nTotal full spots: {fullSpots}");
             Console.WriteLine($"Total free spots: {freeSpots}");
+            Console.WriteLine($"Total spots with one motorcycle (available for another MC): {mcSpots}");
             if (fullSpotNumbers.Count > 0)
             {
                 Console.WriteLine("Parking Spots occupied: " + string.Join(", ", fullSpotNumbers));
