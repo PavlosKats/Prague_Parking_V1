@@ -91,10 +91,10 @@ namespace Prague_Parking_V1
             }
 
             //regex pattern match to validate the license plate
-            string pattern = @"^[A-Za-zÅÄÖØÆåäöøæ]{3}[0-9]{4}$";
+            string pattern = @"^[A-Za-zÅÄÖØÆåäöøæ]{3}[0-9]{3}$";
             if (!Regex.IsMatch(licensePlate, pattern))
             {
-                Console.WriteLine("\nInvalid license plate format. Please use the format ABC1234.");
+                Console.WriteLine("\nInvalid license plate format. Please use the format ABC123.");
                 return;
             }
 
@@ -320,6 +320,7 @@ namespace Prague_Parking_V1
             //take license plate and destination spot as input
             Console.WriteLine("\nEnter the license plate of the vehicle to move:");
             string licensePlate = Console.ReadLine().ToUpper();
+            
             int fromSpot = -1;
             string vehicleType = null;
             string vehicleString = null;

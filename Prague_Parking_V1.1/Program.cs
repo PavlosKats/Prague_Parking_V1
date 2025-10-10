@@ -123,10 +123,10 @@ namespace Prague_Parking_V1._1
             }
 
             //regex pattern match to validate the license plate
-            string pattern = @"^[A-Za-zÅÄÖØÆåäöøæ]{3}[0-9]{4}$";
+            string pattern = @"^[A-Za-zÅÄÖØÆåäöøæ]{3}[0-9]{3}$";
             if (!Regex.IsMatch(licensePlate, pattern))
             {
-                Console.WriteLine("\nInvalid license plate format. Please use the format ABC1234.");
+                Console.WriteLine("\nInvalid license plate format. Please use the format ABC123.");
                 return;
             }
 
