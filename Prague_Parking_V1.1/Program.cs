@@ -361,33 +361,30 @@ namespace Prague_Parking_V1._1
                     return;
                 }
 
-                
-                Console.WriteLine("\nEnter the license plate of the vehicle to check out:");
-                string licensePlate = Console.ReadLine().ToUpper();
-
-                //find the vehicle in the spot
-                int index = spot.FindIndex(v => v.Split("#")[1] == licensePlate);
-                if (index == -1)
+                // List, calculate duration, and remove all vehicles in the spot
+                foreach (var v in spot.ToList())
                 {
-                    Console.WriteLine($"\nVehicle with license plate {licensePlate} not found in spot {spotNumber}.");
-                    return;
+                    string[] parts = v.Split('#');
+                    string type = parts[0];
+                    string licensePlate = parts[1];
+                    string timestamp = parts.Length > 2 ? parts[2] : "N/A";
+                    Console.WriteLine($"\nVehicle {licensePlate} of type {type} (registered on {timestamp}) is being checked out from spot {spotNumber}.");
+
+                    // Calculate and display duration
+                    if (DateTime.TryParse(timestamp, out DateTime registeredTime))
+                    {
+                        TimeSpan duration = DateTime.Now - registeredTime;
+                        string durationStr = $"{(int)duration.TotalHours} hours, {duration.Minutes} minutes, {duration.Seconds} seconds";
+                        Console.WriteLine($"Vehicle was parked for: {durationStr}");
+                    }
+
+                    // Remove vehicle from spot
+                    spot.Remove(v);
+                    Console.WriteLine($"Vehicle {licensePlate} has been checked out from spot {spotNumber}.");
                 }
-
-                string[] parts = spot[index].Split('#');
-                string timestamp = parts.Length > 2 ? parts[2] : "N/A";
-                Console.WriteLine($"\nVehicle {licensePlate} was registered on {timestamp}.");
-
-                //calculate parking duration
-                if(DateTime.TryParse(timestamp, out DateTime registeredTime))
-                {
-                    TimeSpan duration = DateTime.Now - registeredTime;
-                    string durationStr = $"{(int)duration.Hours} hours,{duration.Minutes} minutes, {duration.Seconds} seconds";
-                    Console.WriteLine($"Vehicle was parked for {durationStr}");
-                }
-
-                spot.RemoveAt(index);
-                Console.WriteLine($"\nVehicle {licensePlate} has been checked out from spot {spotNumber}.");
             }
+
+            
             else if (option == "2")
             {
                 Console.WriteLine("\nEnter the license plate of the vehicle to check out:");

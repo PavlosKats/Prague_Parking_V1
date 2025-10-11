@@ -268,20 +268,17 @@ namespace Prague_Parking_V1
                     return;
                 }
 
-                
-                Console.WriteLine("\nEnter the license plate of the vehicle to check out:");
-                string licensePlate = Console.ReadLine().ToUpper();
-
-                //find the vehicle in the spot
-                int index = spot.FindIndex(v => v.EndsWith("#" + licensePlate));
-                if (index == -1)
+                // List vehicles being checked out
+                foreach (var v in spot)
                 {
-                    Console.WriteLine($"\nVehicle with license plate {licensePlate} not found in spot {spotNumber}.");
-                    return;
+                    var parts = v.Split('#');
+                    string type = parts[0];
+                    string licensePlate = parts[1];
+                    Console.WriteLine($"\nVehicle {licensePlate} of type {type} has been checked out from spot {spotNumber}.");
                 }
+                spot.Clear();
 
-                spot.RemoveAt(index);
-                Console.WriteLine($"\nVehicle {licensePlate} has been checked out from spot {spotNumber}.");
+               
             }
             else if (option == "2")
             {
