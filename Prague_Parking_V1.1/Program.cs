@@ -42,7 +42,7 @@ namespace Prague_Parking_V1._1
                     "  2: Check out vehicle",
                     "  3: Move vehicle to another spot",
                     "  4: Check parking spot number availability",
-                    "  5: Check status of all parking spots",
+                    "  5: Check parking map grid",
                     "  6: Optimize motorcycle parking",
                     "  0: Exit",
                     ""
